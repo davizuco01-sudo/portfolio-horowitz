@@ -1,0 +1,158 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens
+ * ----------------------------------------------------------------------------
+ * All colours used by the site are defined here. Tailwind's default palette is
+ * intentionally removed so that every colour in the UI comes from this list.
+ *
+ * Usage examples: bg-canvas, bg-surface, border-line, text-fg, text-fg-muted,
+ * text-accent, bg-status-prototype.
+ *
+ * Contrast (WCAG 2.x, normal text):
+ *   fg-muted on canvas ≈ 6.1:1, on surface ≈ 5.3:1, on surface-2 ≈ 4.6:1
+ *   accent on canvas ≈ 7.4:1
+ * fg-muted was lightened slightly from #8493A7 so it also passes AA on surface-2.
+ */
+@theme {
+  --color-*: initial;
+
+  /* Surfaces */
+  --color-canvas: #111827;
+  --color-surface: #1b2535;
+  --color-surface-2: #243047;
+
+  /* Borders */
+  --color-line: #2c3a52;
+  --color-line-strong: #3d4d69;
+
+  /* Text */
+  --color-fg: #f3f5f9;
+  --color-fg-secondary: #b8c3d3;
+  --color-fg-muted: #8a99ad;
+
+  /* Accent */
+  --color-accent: #79a8f8;
+  --color-accent-hover: #9cc0fb;
+
+  /* Project status indicators */
+  --color-status-development: #79a8f8;
+  --color-status-prototype: #e3b96f;
+  --color-status-experiment: #7cc8b6;
+
+  /* Utility */
+  --color-black: #000;
+
+  /* Typography */
+  --font-sans:
+    "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  --font-mono:
+    ui-monospace, "SFMono-Regular", "SF Mono", "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas,
+    monospace;
+
+  /* Motion */
+  --ease-out-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --animate-rise: rise 0.7s var(--ease-out-soft) both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    background-color: var(--color-canvas);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100dvh;
+    background-color: var(--color-canvas);
+    color: var(--color-fg-secondary);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--color-fg);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--color-accent) 35%, transparent);
+    color: var(--color-fg);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  /* Elements that receive focus programmatically (route changes, in-page anchors). */
+  [tabindex="-1"]:focus {
+    outline: none;
+  }
+
+  /* Keep anchored sections clear of the sticky navigation bar. */
+  [id] {
+    scroll-margin-top: 6rem;
+  }
+
+  /* Prevent background scrolling while the image viewer is open. */
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+
+  dialog::backdrop {
+    background-color: rgb(5 8 15 / 0.88);
+  }
+}
+
+/* Small uppercase metadata label. Use sparingly. */
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-fg-muted);
+}
+
+/* Faint engineering grid used behind the hero and inside media placeholders. */
+@utility bg-blueprint {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--color-line) 70%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--color-line) 70%, transparent) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: -1px -1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
