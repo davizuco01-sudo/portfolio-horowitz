@@ -1,11 +1,10 @@
 import { ArrowUpRight, FileText, Mail } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { labels } from '../../data/labels';
-import { placeholders } from '../../data/placeholders';
 import { site } from '../../data/site';
-import { hasText, isDraft, newTabProps, prettyUrl } from '../../lib/content';
+import { isMeaningful, newTabProps, prettyUrl } from '../../lib/content';
+import { homeSections } from '../../lib/homeSections';
 import { PageContainer } from '../layout/PageContainer';
-import { Placeholder } from '../ui/Draft';
 import { GithubIcon, LinkedinIcon } from '../ui/Icons';
 import { Prose } from '../ui/Prose';
 import { SectionHeading } from '../ui/SectionHeading';
@@ -55,11 +54,12 @@ function getContactItems(): ContactItem[] {
   ];
 }
 
+/** Renders only when there is an introduction or at least one real link. */
 export function Contact() {
+  if (!homeSections.contact) return null;
   const text = labels.sections.contact;
-  const introduction = site.contact.introduction;
-  // Only real destinations are shown; draft mode also shows the empty slots.
-  const items = getContactItems().filter((item) => item.href || isDraft);
+  // Only real destinations are shown; unset links are omitted entirely.
+  const items = getContactItems().filter((item): item is ContactItem & { href: string } => isMeaningful(item.href));
 
   return (
     <section id="contact" aria-labelledby="contact-title" className="border-t border-line/60 py-20 sm:py-24">
@@ -67,22 +67,14 @@ export function Contact() {
         <div className="grid gap-10 rounded-3xl border border-line bg-surface/40 p-6 sm:p-10 lg:grid-cols-12 lg:gap-12 lg:p-12">
           <div className="lg:col-span-5">
             <SectionHeading id="contact-title" eyebrow={text.eyebrow} title={text.title} />
-            {hasText(introduction) ? (
-              <Prose paragraphs={introduction} className="mt-5" />
-            ) : (
-              isDraft && (
-                <p className="mt-5 leading-7">
-                  <Placeholder>{placeholders.contactIntroduction}</Placeholder>
-                </p>
-              )
-            )}
+            <Prose paragraphs={site.contact.introduction} className="mt-5" />
           </div>
 
           {items.length > 0 && (
             <ul className="grid content-start gap-3 sm:grid-cols-2 lg:col-span-7">
               {items.map((item) => (
                 <li key={item.key}>
-                  {item.href ? <ContactLink item={item} href={item.href} /> : <ContactSlot item={item} />}
+                  <ContactLink item={item} href={item.href} />
                 </li>
               ))}
             </ul>
@@ -114,18 +106,5 @@ function ContactLink({ item, href }: { item: ContactItem; href: string }) {
       {tabProps.target && <span className="sr-only"> {labels.newTab}</span>}
       <ArrowUpRight aria-hidden className="size-4 shrink-0 text-fg-muted transition-colors group-hover:text-accent" />
     </a>
-  );
-}
-
-/** Non-interactive slot shown in draft mode for a link that is not configured yet. */
-function ContactSlot({ item }: { item: ContactItem }) {
-  return (
-    <div className={`${rowClasses} border-dashed border-line text-fg-muted`} data-placeholder="">
-      <span className={`${iconBoxClasses} border-line`}>{item.icon}</span>
-      <span className="min-w-0">
-        <span className="block text-sm font-medium text-fg-secondary">{item.label}</span>
-        <span className="block text-sm">{placeholders.contactLink}</span>
-      </span>
-    </div>
   );
 }

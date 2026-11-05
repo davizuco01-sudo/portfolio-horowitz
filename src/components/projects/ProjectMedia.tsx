@@ -3,7 +3,8 @@ import { useRef, useState, type ReactNode } from 'react';
 import { labels } from '../../data/labels';
 import { placeholders } from '../../data/placeholders';
 import { cn } from '../../lib/cn';
-import { newTabProps } from '../../lib/content';
+import { isMeaningful, newTabProps } from '../../lib/content';
+import { previewSource } from '../../lib/media';
 import type { ExternalVideoMedia, ImageMedia, MediaItem, VideoMedia } from '../../types/project';
 import { MediaPlaceholder } from '../ui/MediaPlaceholder';
 
@@ -24,13 +25,12 @@ function reportMediaError(path: string) {
 /* -------------------------------------------------------------------------- */
 
 interface ProjectMediaProps {
-  /** null renders the designed placeholder frame. */
-  media: MediaItem | null;
+  /** Callers render ProjectMedia only when real media exists. */
+  media: MediaItem;
   /** Load immediately; use for media visible on first paint. */
   priority?: boolean;
   /** Aspect ratio used when the media item does not define one. */
   defaultAspectRatio?: string;
-  placeholderTag?: string;
   className?: string;
 }
 
@@ -38,22 +38,17 @@ export function ProjectMedia({
   media,
   priority = false,
   defaultAspectRatio = DEFAULT_ASPECT_RATIO,
-  placeholderTag,
   className,
 }: ProjectMediaProps) {
   return (
     <figure className={className}>
       <div
         className="relative overflow-hidden rounded-xl border border-line bg-surface"
-        style={{ aspectRatio: media?.aspectRatio ?? defaultAspectRatio }}
+        style={{ aspectRatio: media.aspectRatio ?? defaultAspectRatio }}
       >
-        {media ? (
-          <MediaContent key={mediaKey(media)} media={media} priority={priority} />
-        ) : (
-          <MediaPlaceholder tag={placeholderTag} />
-        )}
+        <MediaContent key={mediaKey(media)} media={media} priority={priority} />
       </div>
-      {media?.caption && (
+      {isMeaningful(media.caption) && (
         <figcaption className="mt-3 max-w-prose text-sm leading-6 text-fg-muted">{media.caption}</figcaption>
       )}
     </figure>
@@ -155,7 +150,9 @@ function EnlargeableImage({
             decoding="async"
             className="max-h-[80dvh] w-auto max-w-full rounded-lg object-contain"
           />
-          {media.caption && <p className="max-w-prose text-center text-sm text-fg-secondary">{media.caption}</p>}
+          {isMeaningful(media.caption) && (
+            <p className="max-w-prose text-center text-sm text-fg-secondary">{media.caption}</p>
+          )}
         </div>
       </dialog>
     </>
@@ -223,36 +220,13 @@ function ExternalVideoLink({ media }: { media: ExternalVideoMedia }) {
 /* MediaPreview: non-interactive preview that fills its parent (cards)        */
 /* -------------------------------------------------------------------------- */
 
-function previewSource(media: MediaItem): { src: string; alt: string } | null {
-  switch (media.type) {
-    case 'image':
-      return { src: media.src, alt: media.alt };
-    case 'video':
-      return media.poster ? { src: media.poster, alt: media.title } : null;
-    case 'external-video':
-      return media.thumbnail ? { src: media.thumbnail, alt: media.title } : null;
-  }
-}
-
-export function MediaPreview({
-  media,
-  compact = false,
-  placeholderTag,
-}: {
-  media: MediaItem | null;
-  compact?: boolean;
-  placeholderTag?: string;
-}) {
-  const source = media ? previewSource(media) : null;
-  const placeholder = (
-    <MediaPlaceholder
-      compact={compact}
-      tag={placeholderTag}
-      label={compact ? placeholders.mediaShort : placeholders.media}
-    />
-  );
-  if (!source) return placeholder;
-  return <PreviewImage key={source.src} src={source.src} alt={source.alt} fallback={placeholder} />;
+/** Fills its parent. Render only when `hasMediaPreview(media)` (lib/media.ts) is true. */
+export function MediaPreview({ media, compact = false }: { media: MediaItem; compact?: boolean }) {
+  const source = previewSource(media);
+  if (!source) return null;
+  // Shown only if the file fails to load (a broken path), never for missing content.
+  const fallback = <MediaPlaceholder compact={compact} label={placeholders.mediaUnavailable} />;
+  return <PreviewImage key={source.src} src={source.src} alt={source.alt} fallback={fallback} />;
 }
 
 function PreviewImage({ src, alt, fallback }: { src: string; alt: string; fallback: ReactNode }) {

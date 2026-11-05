@@ -1,11 +1,12 @@
 import { labels } from '../../data/labels';
+import { homeSections } from '../../lib/homeSections';
 import { experimentProjects } from '../../lib/projects';
 import { PageContainer } from '../layout/PageContainer';
 import { ExperimentCard } from '../projects/ExperimentCard';
 import { SectionHeading } from '../ui/SectionHeading';
 
 export function OtherExperiments() {
-  if (experimentProjects.length === 0) return null;
+  if (!homeSections.experiments) return null;
   const text = labels.sections.experiments;
 
   return (

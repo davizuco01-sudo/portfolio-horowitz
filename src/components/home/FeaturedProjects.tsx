@@ -1,10 +1,12 @@
 import { labels } from '../../data/labels';
+import { homeSections } from '../../lib/homeSections';
 import { featuredProjects, getProjectNumber } from '../../lib/projects';
 import { PageContainer } from '../layout/PageContainer';
 import { ProjectCard } from '../projects/ProjectCard';
 import { SectionHeading } from '../ui/SectionHeading';
 
 export function FeaturedProjects() {
+  if (!homeSections.work) return null;
   const text = labels.sections.work;
 
   return (

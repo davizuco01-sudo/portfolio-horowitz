@@ -2,13 +2,11 @@ import { ArrowLeft, Award } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
 import { labels } from '../../data/labels';
-import { placeholders } from '../../data/placeholders';
-import { isDraft } from '../../lib/content';
+import { isMeaningful } from '../../lib/content';
 import { getProjectNumber, getStatusLabel, getVisibleRecognition } from '../../lib/projects';
 import type { Project } from '../../types/project';
 import { PageContainer } from '../layout/PageContainer';
 import { StatusDot, TagList } from '../ui/Badge';
-import { Placeholder } from '../ui/Draft';
 import { ProjectMedia } from './ProjectMedia';
 
 /** Section A: Project Overview. */
@@ -16,9 +14,10 @@ export function ProjectHero({ project }: { project: Project }) {
   const number = getProjectNumber(project);
   const award = getVisibleRecognition(project)[0];
   const factLabels = labels.project.facts;
+  const media = project.featuredMedia ?? project.cover;
 
   const facts: Array<{ label: string; value: ReactNode }> = [];
-  if (project.category) facts.push({ label: factLabels.category, value: project.category });
+  if (isMeaningful(project.category)) facts.push({ label: factLabels.category, value: project.category });
   facts.push({
     label: factLabels.status,
     value: (
@@ -28,7 +27,7 @@ export function ProjectHero({ project }: { project: Project }) {
       </span>
     ),
   });
-  if (project.timeframe) facts.push({ label: factLabels.timeframe, value: project.timeframe });
+  if (isMeaningful(project.timeframe)) facts.push({ label: factLabels.timeframe, value: project.timeframe });
   if (award) {
     facts.push({
       label: factLabels.recognition,
@@ -74,10 +73,8 @@ export function ProjectHero({ project }: { project: Project }) {
             >
               {project.title}
             </h1>
-            {(project.summary || isDraft) && (
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-fg-secondary">
-                {project.summary ?? <Placeholder>{placeholders.projectSummary}</Placeholder>}
-              </p>
+            {isMeaningful(project.summary) && (
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-fg-secondary">{project.summary}</p>
             )}
             <TagList items={project.technologies} label={factLabels.technologies} className="mt-6" />
           </div>
@@ -92,15 +89,7 @@ export function ProjectHero({ project }: { project: Project }) {
           </dl>
         </div>
 
-        {(project.cover || isDraft) && (
-          <ProjectMedia
-            media={project.cover}
-            priority
-            defaultAspectRatio="16 / 9"
-            placeholderTag={number ? `Fig. ${number}` : undefined}
-            className="mt-12 sm:mt-16"
-          />
-        )}
+        {media && <ProjectMedia media={media} priority defaultAspectRatio="16 / 9" className="mt-12 sm:mt-16" />}
       </PageContainer>
     </header>
   );

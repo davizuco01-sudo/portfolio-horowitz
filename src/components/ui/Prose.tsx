@@ -1,4 +1,5 @@
 import { cn } from '../../lib/cn';
+import { meaningful } from '../../lib/content';
 import type { Paragraphs } from '../../types/project';
 
 const proseSizes = {
@@ -17,7 +18,7 @@ export function Prose({
   size?: keyof typeof proseSizes;
   className?: string;
 }) {
-  const items = paragraphs.filter((p) => p.trim().length > 0);
+  const items = meaningful(paragraphs);
   if (items.length === 0) return null;
   return (
     <div className={cn('max-w-prose space-y-4 text-fg-secondary', proseSizes[size], className)}>
@@ -30,7 +31,7 @@ export function Prose({
 
 /** Simple bulleted list. Renders nothing when empty. */
 export function BulletList({ items, className }: { items: string[]; className?: string }) {
-  const list = items.filter((item) => item.trim().length > 0);
+  const list = meaningful(items);
   if (list.length === 0) return null;
   return (
     <ul className={cn('max-w-prose space-y-3 text-fg-secondary', className)}>

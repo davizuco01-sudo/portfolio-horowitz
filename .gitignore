@@ -11,6 +11,19 @@ node_modules
 dist
 dist-ssr
 *.local
+*.tsbuildinfo
+
+# Secrets and local environment files (the site needs none; never commit them)
+.env
+.env.*
+!.env.example
+
+# Vercel CLI project link (created by `vercel link` / `vercel deploy`)
+.vercel
+
+# Unredacted original screenshots (contain unverified personal data). Development only:
+# never move these into public/ or commit them. Publication-safe copies live in public/media/.
+private-media/
 
 # Editor directories and files
 .vscode/*

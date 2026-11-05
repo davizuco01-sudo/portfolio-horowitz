@@ -4,14 +4,18 @@
  * Conventions used throughout the content files:
  * - `null` means "not provided yet".
  * - An empty array (`[]`) means "nothing written yet".
- * - Empty content renders as a neutral draft placeholder while the portfolio is
- *   in draft mode, and is hidden entirely once it is published.
+ * - Empty content is never rendered, in draft or published mode. A section
+ *   with no real content disappears, including from "On this page". Keep the
+ *   fields in place so content can be added later.
  */
 
 /** Ordered paragraphs of plain text. One string per paragraph. */
 export type Paragraphs = string[];
 
 export type ProjectStatus = 'in-development' | 'prototype' | 'experiment';
+
+/** Sections B–H of the project page template. */
+export type ProjectSectionId = 'problem' | 'built' | 'howItWorks' | 'challenges' | 'lessons' | 'results' | 'links';
 
 /* -------------------------------------------------------------------------- */
 /* Media                                                                      */
@@ -95,6 +99,11 @@ export interface ProjectWalkthrough {
   steps: ProjectStep[];
   /** Screenshots, clips and diagrams with captions. */
   gallery: MediaItem[];
+  /**
+   * "grid" (default) places gallery items two per row on wider screens.
+   * "stacked" gives each item the full content width, for detailed screenshots.
+   */
+  galleryLayout: 'grid' | 'stacked';
 }
 
 /** One entry in Section E: Challenges & Decisions. */
@@ -111,6 +120,8 @@ export interface ProjectChallenge {
 
 /** Section F: What I Learned. */
 export interface ProjectLessons {
+  /** Narrative paragraphs, shown before any grouped lessons. */
+  overview: Paragraphs;
   technical: string[];
   product: string[];
   research: string[];
@@ -129,6 +140,8 @@ export interface Recognition {
   date: string | null;
   /** Certificate path (e.g. "/certificates/award.pdf") or URL. */
   certificateUrl: string | null;
+  /** Optional image of the certificate (e.g. its first page), shown with the award. */
+  certificatePreview?: ImageMedia;
   /**
    * Set to true only after checking every field against the official
    * certificate. Unverified entries are hidden once the site is published.
@@ -138,6 +151,8 @@ export interface Recognition {
 
 /** Section G: Results & Next Steps. */
 export interface ProjectResults {
+  /** Narrative paragraphs, shown before the structured lists. */
+  overview: Paragraphs;
   /** Results you can demonstrate. */
   demonstrated: string[];
   recognition: Recognition[];
@@ -184,10 +199,20 @@ export interface Project {
   technologies: string[];
   /** Main preview, used on cards and in the project overview. */
   cover: MediaItem | null;
+  /** Optional main image for the project page only. Falls back to `cover`. */
+  featuredMedia: MediaItem | null;
+  /**
+   * Optional per-project section headings, used when the approved source text
+   * names a section differently (e.g. `{ problem: 'Why I Built It' }`).
+   * Omitted sections keep the default titles from `labels.project.sections`.
+   */
+  sectionTitles: Partial<Record<ProjectSectionId, string>>;
 
   problem: Paragraphs;
   built: ProjectBuild;
   howItWorks: ProjectWalkthrough;
+  /** Narrative paragraphs for Section E, shown before any challenge entries. */
+  challengesOverview: Paragraphs;
   challenges: ProjectChallenge[];
   lessons: ProjectLessons;
   results: ProjectResults;

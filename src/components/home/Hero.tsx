@@ -2,10 +2,9 @@ import { ArrowDown, ArrowUpRight } from 'lucide-react';
 import { Fragment } from 'react';
 import { Link } from 'react-router';
 import { labels } from '../../data/labels';
-import { placeholders } from '../../data/placeholders';
 import { site } from '../../data/site';
 import { cn } from '../../lib/cn';
-import { hasText, isDraft, siteTitle } from '../../lib/content';
+import { hasText, isMeaningful, siteTitle } from '../../lib/content';
 import {
   experimentProjects,
   featuredProjects,
@@ -16,12 +15,11 @@ import {
 import { PageContainer } from '../layout/PageContainer';
 import { StatusDot } from '../ui/Badge';
 import { ButtonLink } from '../ui/Button';
-import { Placeholder } from '../ui/Draft';
 import { Prose } from '../ui/Prose';
 
 export function Hero() {
-  const { name, discipline, interests, hero } = site;
-  const labelItems = [discipline, ...interests].filter((item): item is string => Boolean(item));
+  const { discipline, interests, hero } = site;
+  const labelItems = [discipline, ...interests].filter(isMeaningful);
 
   return (
     <section aria-labelledby="hero-title" className="relative isolate overflow-hidden">
@@ -37,7 +35,7 @@ export function Hero() {
               <Fragment key={item}>
                 {index > 0 && (
                   <span aria-hidden className="text-line-strong">
-                    /
+                    ·
                   </span>
                 )}
                 <span>{item}</span>
@@ -48,25 +46,15 @@ export function Hero() {
 
         <div className="mt-8 grid gap-14 lg:grid-cols-12 lg:items-end lg:gap-12">
           <div className="motion-safe:animate-rise lg:col-span-7">
-            <h1 id="hero-title" className="text-lg font-medium text-fg sm:text-xl">
-              {name ?? (isDraft ? <Placeholder>{placeholders.name}</Placeholder> : siteTitle)}
+            {/* The large heading is `hero.heading` (the applicant's name), falling back to the site title. */}
+            <h1
+              id="hero-title"
+              className="text-4xl leading-[1.08] font-semibold tracking-[-0.025em] text-fg sm:text-5xl lg:text-[3.5rem]"
+            >
+              {isMeaningful(hero.heading) ? hero.heading : siteTitle}
             </h1>
 
-            {(hero.heading || isDraft) && (
-              <p className="mt-4 text-4xl leading-[1.08] font-semibold tracking-[-0.025em] text-fg sm:text-5xl lg:text-[3.5rem]">
-                {hero.heading ?? <Placeholder>{placeholders.heroHeading}</Placeholder>}
-              </p>
-            )}
-
-            {hasText(hero.introduction) ? (
-              <Prose paragraphs={hero.introduction} size="lg" className="mt-6 max-w-xl" />
-            ) : (
-              isDraft && (
-                <p className="mt-6 max-w-xl text-lg leading-8">
-                  <Placeholder>{placeholders.heroIntroduction}</Placeholder>
-                </p>
-              )
-            )}
+            {hasText(hero.introduction) && <Prose paragraphs={hero.introduction} size="lg" className="mt-6 max-w-xl" />}
 
             <div className="mt-10 flex flex-wrap items-center gap-3">
               <ButtonLink to="/#work" iconEnd={<ArrowDown aria-hidden className="size-4" />}>

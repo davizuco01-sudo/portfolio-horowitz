@@ -107,7 +107,7 @@ export const labels = {
       viewCertificate: 'View certificate',
     },
     links: {
-      repository: 'Source code',
+      repository: 'View Source on GitHub',
       liveDemo: 'Live demo',
       video: 'Video demonstration',
       certificate: 'Award certificate',
@@ -145,6 +145,5 @@ export const labels = {
 
   footer: {
     navigation: 'Footer',
-    draft: 'Draft version',
   },
 } as const;

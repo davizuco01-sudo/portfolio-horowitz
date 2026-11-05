@@ -1,11 +1,8 @@
 import { Image as ImageIcon } from 'lucide-react';
-import { placeholders } from '../../data/placeholders';
 import { cn } from '../../lib/cn';
 
 interface MediaPlaceholderProps {
-  label?: string;
-  /** Small technical tag in the corner, e.g. "Fig. 01". */
-  tag?: string;
+  label: string;
   /** Smaller icon and text, for thumbnails. */
   compact?: boolean;
   className?: string;
@@ -14,15 +11,11 @@ interface MediaPlaceholderProps {
 const cornerBase = 'absolute border-line-strong';
 
 /**
- * Neutral frame shown wherever real media has not been added yet.
- * It fills its parent, which is responsible for the aspect ratio.
+ * Neutral frame shown when a referenced media file fails to load (a broken
+ * path). It is never used for media that has not been added: in that case the
+ * frame is not rendered at all. It fills its parent, which sets the aspect ratio.
  */
-export function MediaPlaceholder({
-  label = placeholders.media,
-  tag,
-  compact = false,
-  className,
-}: MediaPlaceholderProps) {
+export function MediaPlaceholder({ label, compact = false, className }: MediaPlaceholderProps) {
   const corner = cn(cornerBase, compact ? 'm-1.5 size-2' : 'm-3 size-3');
   return (
     <div
@@ -53,19 +46,13 @@ export function MediaPlaceholder({
         <p
           className={cn(
             'font-mono text-fg-muted',
-            // Thumbnails are too small for text on phones; the icon alone signals the empty slot.
+            // Thumbnails are too small for text on phones; the icon alone signals the problem.
             compact ? 'sr-only text-[10px] leading-tight sm:not-sr-only' : 'text-xs tracking-wide',
           )}
         >
           {label}
         </p>
       </div>
-
-      {tag && (
-        <span aria-hidden className="absolute bottom-[9px] left-8 font-mono text-[11px] text-fg-muted/80">
-          {tag}
-        </span>
-      )}
     </div>
   );
 }

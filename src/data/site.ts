@@ -4,29 +4,31 @@ import type { SiteConfig } from '../types/site';
  * Site identity, introduction and personal links.
  *
  * Everything in this file is the applicant's own content.
- * - `null` / `[]` = not provided yet. Draft mode shows a neutral placeholder;
- *   published mode hides the element.
+ * - `null` / `[]` = not provided yet. The element, and its whole section when
+ *   nothing else is filled in, is hidden in both draft and published mode.
  * - Only add real, verified information. Never add example or invented links.
  */
 export const site: SiteConfig = {
   /**
    * Switch to "published" once the Pre-Submission Checklist in README.md is
-   * complete. Published mode hides every remaining placeholder.
+   * complete. Its only effect: unverified awards are hidden when published.
    */
   portfolioStatus: 'draft',
 
-  // TODO(applicant): your full name.
-  name: null,
+  // Navbar, footer and browser tab title ("David Gala | Portfolio" on the homepage).
+  name: 'David Gala',
 
-  // Known context from the project brief.
-  discipline: 'Mathematical Engineering Student',
-  interests: ['Artificial Intelligence', 'Building Software'],
+  // Small label above the hero heading, shown as "MATHEMATICAL ENGINEERING · AI · SOFTWARE".
+  discipline: 'Mathematical Engineering',
+  interests: ['AI', 'Software'],
 
   hero: {
-    // TODO(applicant): one sentence, in your own words, about what you build and why.
-    heading: null,
-    // TODO(applicant): a short personal introduction (one or two short paragraphs).
-    introduction: [],
+    // The large homepage heading (the page's <h1>). Text approved by the applicant.
+    heading: 'David Gala',
+    // Approved by the applicant; copy verbatim.
+    introduction: [
+      "I'm a Mathematical Engineering student who started building with AI out of curiosity. I've been exploring how to turn what I learn into useful software.",
+    ],
     // Optional, e.g. { label: 'GitHub profile', url: 'https://github.com/<username>' }
     secondaryLink: null,
   },

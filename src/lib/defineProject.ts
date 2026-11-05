@@ -15,7 +15,10 @@ export function defineProject(input: ProjectInput): Project {
     summary: null,
     technologies: [],
     cover: null,
+    featuredMedia: null,
+    sectionTitles: {},
     problem: [],
+    challengesOverview: [],
     challenges: [],
     ...input,
     built: {
@@ -29,9 +32,11 @@ export function defineProject(input: ProjectInput): Project {
       intro: [],
       steps: [],
       gallery: [],
+      galleryLayout: 'grid',
       ...input.howItWorks,
     },
     lessons: {
+      overview: [],
       technical: [],
       product: [],
       research: [],
@@ -39,6 +44,7 @@ export function defineProject(input: ProjectInput): Project {
       ...input.lessons,
     },
     results: {
+      overview: [],
       demonstrated: [],
       recognition: [],
       traction: [],

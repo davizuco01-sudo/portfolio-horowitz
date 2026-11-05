@@ -3,11 +3,11 @@ import { Link } from 'react-router';
 import { labels } from '../../data/labels';
 import { placeholders } from '../../data/placeholders';
 import { cn } from '../../lib/cn';
-import { isDraft } from '../../lib/content';
+import { isMeaningful } from '../../lib/content';
 import { getStatusLabel, getVisibleRecognition, projectPath } from '../../lib/projects';
 import type { Project } from '../../types/project';
 import { StatusBadge, TagList } from '../ui/Badge';
-import { Placeholder } from '../ui/Draft';
+import { hasMediaPreview } from '../../lib/media';
 import { MediaPreview } from './ProjectMedia';
 
 interface ProjectCardProps {
@@ -25,28 +25,33 @@ interface ProjectCardProps {
  */
 export function ProjectCard({ project, number, prominent = false, className }: ProjectCardProps) {
   const award = getVisibleRecognition(project)[0];
+  const cover = hasMediaPreview(project.cover) ? project.cover : null;
+  // The split image/text layout only makes sense when there is an image.
+  const split = prominent && cover !== null;
 
   return (
     <article
       className={cn(
         'group relative flex flex-col overflow-hidden rounded-2xl border border-line bg-surface transition-[border-color,translate] duration-300 ease-out-soft hover:border-line-strong motion-safe:hover:-translate-y-0.5',
         'has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-4 has-[a:focus-visible]:outline-accent',
-        prominent && 'lg:grid lg:grid-cols-12',
+        split && 'lg:grid lg:grid-cols-12',
         className,
       )}
     >
-      <div
-        className={cn(
-          'relative overflow-hidden border-b border-line',
-          prominent
-            ? 'aspect-[16/10] md:aspect-[2/1] lg:col-span-7 lg:aspect-auto lg:min-h-[26rem] lg:border-r lg:border-b-0'
-            : 'aspect-[16/10]',
-        )}
-      >
-        <MediaPreview media={project.cover} placeholderTag={`Fig. ${number}`} />
-      </div>
+      {cover && (
+        <div
+          className={cn(
+            'relative overflow-hidden border-b border-line',
+            split
+              ? 'aspect-[16/10] md:aspect-[2/1] lg:col-span-7 lg:aspect-auto lg:min-h-[26rem] lg:border-r lg:border-b-0'
+              : 'aspect-[16/10]',
+          )}
+        >
+          <MediaPreview media={cover} />
+        </div>
+      )}
 
-      <div className={cn('flex flex-1 flex-col p-6 sm:p-7', prominent && 'lg:col-span-5 lg:p-10')}>
+      <div className={cn('flex flex-1 flex-col p-6 sm:p-7', split && 'lg:col-span-5 lg:p-10')}>
         <div className="flex items-center justify-between gap-4">
           <span className="font-mono text-xs text-fg-muted">{number}</span>
           <StatusBadge status={project.status} label={getStatusLabel(project)} />
@@ -66,14 +71,12 @@ export function ProjectCard({ project, number, prominent = false, className }: P
           </Link>
         </h3>
 
-        {project.category && (
+        {isMeaningful(project.category) && (
           <p className="mt-2 font-mono text-xs tracking-wide text-fg-muted">{project.category}</p>
         )}
 
-        {(project.summary || isDraft) && (
-          <p className="mt-4 text-[15px] leading-7 text-fg-secondary">
-            {project.summary ?? <Placeholder>{placeholders.projectSummary}</Placeholder>}
-          </p>
+        {isMeaningful(project.summary) && (
+          <p className="mt-4 text-[15px] leading-7 text-fg-secondary">{project.summary}</p>
         )}
 
         {award && (

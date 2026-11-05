@@ -2,9 +2,9 @@ import type { LucideIcon } from 'lucide-react';
 import type { Paragraphs } from './project';
 
 /**
- * - "draft": missing content shows neutral placeholders; unverified awards are
- *   shown with a "pending verification" marker.
- * - "published": missing content and unverified awards are hidden.
+ * Missing content is hidden in BOTH modes; no placeholders are ever rendered.
+ * - "draft": unverified awards are shown with a "pending verification" marker.
+ * - "published": unverified awards are hidden.
  */
 export type PortfolioStatus = 'draft' | 'published';
 

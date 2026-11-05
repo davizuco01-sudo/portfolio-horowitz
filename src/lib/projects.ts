@@ -1,7 +1,7 @@
 import { labels } from '../data/labels';
 import { projects } from '../data/projects';
 import type { Project, Recognition } from '../types/project';
-import { formatIndex, isDraft } from './content';
+import { formatIndex, isDraft, isMeaningful } from './content';
 
 /** Projects shown in "Featured Projects", in content order. */
 export const featuredProjects: Project[] = projects.filter((p) => p.featured);
@@ -51,6 +51,7 @@ export function getAdjacentProjects(project: Project): {
 /**
  * Recognition entries that may be shown. Unverified entries are visible only
  * in draft mode, where they carry a "pending verification" marker.
+ * This is the ONLY behaviour that `portfolioStatus` controls.
  */
 export function getVisibleRecognition(project: Project): Recognition[] {
   return project.results.recognition.filter((r) => r.verified || isDraft);
@@ -70,16 +71,18 @@ export function getProjectLinks(project: Project): ResolvedLink[] {
   const linkLabels = labels.project.links;
   const result: ResolvedLink[] = [];
 
-  if (repository) result.push({ kind: 'repository', label: linkLabels.repository, url: repository });
-  if (liveDemo) result.push({ kind: 'liveDemo', label: linkLabels.liveDemo, url: liveDemo });
-  if (video) result.push({ kind: 'video', label: linkLabels.video, url: video });
+  if (isMeaningful(repository)) result.push({ kind: 'repository', label: linkLabels.repository, url: repository });
+  if (isMeaningful(liveDemo)) result.push({ kind: 'liveDemo', label: linkLabels.liveDemo, url: liveDemo });
+  if (isMeaningful(video)) result.push({ kind: 'video', label: linkLabels.video, url: video });
   for (const award of getVisibleRecognition(project)) {
-    if (award.certificateUrl) {
+    if (isMeaningful(award.certificateUrl)) {
       result.push({ kind: 'certificate', label: linkLabels.certificate, url: award.certificateUrl });
     }
   }
   for (const doc of documentation) {
-    if (doc.url) result.push({ kind: 'documentation', label: doc.label, url: doc.url });
+    if (isMeaningful(doc.url) && isMeaningful(doc.label)) {
+      result.push({ kind: 'documentation', label: doc.label, url: doc.url });
+    }
   }
   return result;
 }

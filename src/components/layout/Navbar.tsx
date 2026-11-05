@@ -2,9 +2,8 @@ import { Menu, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { labels } from '../../data/labels';
-import { placeholders } from '../../data/placeholders';
 import { site } from '../../data/site';
-import { isDraft, newTabProps, siteTitle } from '../../lib/content';
+import { newTabProps, siteTitle } from '../../lib/content';
 import { BrandMark, GithubIcon } from '../ui/Icons';
 import { sectionLinks } from './navigation';
 import { PageContainer } from './PageContainer';
@@ -36,7 +35,7 @@ export function Navbar() {
         <Link to="/" onClick={close} className="flex min-w-0 items-center gap-3 rounded-md">
           <BrandMark className="size-7 shrink-0" />
           <span className="truncate text-[15px] font-semibold tracking-tight text-fg">
-            {site.name ?? (isDraft ? <span className="text-fg-secondary">{placeholders.name}</span> : siteTitle)}
+            {siteTitle}
           </span>
           <span className="sr-only">({labels.nav.home})</span>
         </Link>

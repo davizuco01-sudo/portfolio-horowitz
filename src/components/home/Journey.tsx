@@ -1,49 +1,45 @@
 import { ArrowRight, Circle } from 'lucide-react';
 import { Link } from 'react-router';
-import { journey } from '../../data/journey';
 import { labels } from '../../data/labels';
-import { placeholders } from '../../data/placeholders';
 import { site } from '../../data/site';
-import { formatIndex, hasText, isDraft } from '../../lib/content';
+import { formatIndex, isMeaningful } from '../../lib/content';
+import { homeSections, visibleJourney } from '../../lib/homeSections';
 import { getProjectBySlug, projectPath } from '../../lib/projects';
 import type { JourneyMilestone } from '../../types/site';
 import { PageContainer } from '../layout/PageContainer';
-import { Placeholder } from '../ui/Draft';
 import { Prose } from '../ui/Prose';
 import { SectionHeading } from '../ui/SectionHeading';
 
+/**
+ * About / My Journey. Renders only when there is an introduction or at least
+ * one milestone with written text; milestones without text are skipped.
+ */
 export function Journey() {
+  if (!homeSections.about) return null;
   const text = labels.sections.about;
-  const introduction = site.about.introduction;
 
   return (
     <section id="about" aria-labelledby="about-title" className="border-t border-line/60 py-20 sm:py-24">
       <PageContainer className="grid gap-12 lg:grid-cols-12 lg:gap-16">
-        <div className="lg:col-span-4">
+        <div className={visibleJourney.length > 0 ? 'lg:col-span-4' : 'lg:col-span-8'}>
           <div className="lg:sticky lg:top-28">
             <SectionHeading id="about-title" eyebrow={text.eyebrow} title={text.title} />
-            {hasText(introduction) ? (
-              <Prose paragraphs={introduction} className="mt-5" />
-            ) : (
-              isDraft && (
-                <p className="mt-5 leading-7">
-                  <Placeholder>{placeholders.aboutIntroduction}</Placeholder>
-                </p>
-              )
-            )}
+            <Prose paragraphs={site.about.introduction} className="mt-5" />
           </div>
         </div>
 
-        <ol className="lg:col-span-8">
-          {journey.map((milestone, index) => (
-            <Milestone
-              key={milestone.id}
-              milestone={milestone}
-              number={formatIndex(index + 1)}
-              isLast={index === journey.length - 1}
-            />
-          ))}
-        </ol>
+        {visibleJourney.length > 0 && (
+          <ol className="lg:col-span-8">
+            {visibleJourney.map((milestone, index) => (
+              <Milestone
+                key={milestone.id}
+                milestone={milestone}
+                number={formatIndex(index + 1)}
+                isLast={index === visibleJourney.length - 1}
+              />
+            ))}
+          </ol>
+        )}
       </PageContainer>
     </section>
   );
@@ -73,19 +69,11 @@ function Milestone({
       <div className={isLast ? 'pb-0' : 'pb-12'}>
         <p className="flex flex-wrap items-baseline gap-x-3 pt-2.5 font-mono text-xs text-fg-muted">
           <span>{number}</span>
-          {milestone.date && <span>{milestone.date}</span>}
+          {isMeaningful(milestone.date) && <span>{milestone.date}</span>}
         </p>
         <h3 className="mt-1.5 text-lg font-semibold tracking-tight sm:text-xl">{milestone.title}</h3>
 
-        {hasText(milestone.body) ? (
-          <Prose paragraphs={milestone.body} size="sm" className="mt-3" />
-        ) : (
-          isDraft && (
-            <p className="mt-2 text-[15px] leading-7">
-              <Placeholder>{placeholders.milestoneBody}</Placeholder>
-            </p>
-          )
-        )}
+        <Prose paragraphs={milestone.body} size="sm" className="mt-3" />
 
         {related && (
           <p className="mt-4 text-sm leading-6">
